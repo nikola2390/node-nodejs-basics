@@ -3,6 +3,8 @@ import { createHash } from "crypto";
 import { stdout } from "process";
 import path from "path";
 import { fileURLToPath } from "url";
+import os from "os";
+import { pipeline } from "stream/promises";
 
 const calculateHash = async () => {
   let __filename = fileURLToPath(import.meta.url);
@@ -12,7 +14,10 @@ const calculateHash = async () => {
     path.join(__dirname, "files/fileToCalculateHashFor.txt")
   );
 
-  input.pipe(hash).setEncoding("hex").pipe(stdout);
+  await pipeline(input, hash.setEncoding("hex"), stdout, {
+    end: false,
+  });
+  console.log(os.EOL);
 };
 
 await calculateHash();
